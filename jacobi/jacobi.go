@@ -1,16 +1,18 @@
 package jacobi
 
 import (
-	"log"
+	"errors"
 	"math/big"
 )
 
-// TODO: log.Fatal is not a good way to handle errors
+// TODO: Give arguments a proper naming and
+// update comments on function
 
-// Jacobi - calculates jacobi symbol, returns `int64` not `big.Int`
-func Jacobi(a, m *big.Int) int64 {
+// Jacobi - calculates jacobi symbol
+// NOTE: returns `int64` not `big.Int`
+func Jacobi(a, m *big.Int) (int64, error) {
 	if big.NewInt(0).Mod(m, big.NewInt(2)).Cmp(big.NewInt(0)) == 0 {
-		log.Fatal("Second input parameter can't be even")
+		return 0, errors.New("'m' can not be odd")
 	}
 	var (
 		result = int64(1)
@@ -46,8 +48,8 @@ func Jacobi(a, m *big.Int) int64 {
 	}
 
 	if den.Cmp(one) == 0 {
-		return result
+		return result, nil
 	}
 
-	return 0
+	return 0, errors.New("Denominator does not equal to one")
 }

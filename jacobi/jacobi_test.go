@@ -30,12 +30,19 @@ func TestJacobi(t *testing.T) {
 	fmt.Println("Test for Jacobi")
 
 	for _, test := range testValues {
-		res := Jacobi(test.a, test.m)
+		res, err := Jacobi(test.a, test.m)
 
-		if res != test.jacobi {
-			t.Error("For", test.a, "and", test.m,
-				"expected", test.jacobi,
-				"got", res,
+		if err == nil {
+			if res != test.jacobi {
+				t.Error("For", test.a, "and", test.m,
+					"expected", test.jacobi,
+					"got", res,
+				)
+			}
+		} else {
+			t.Error("Function returned error for:",
+				test.a, "and", test.m,
+				";Error: ", err,
 			)
 		}
 	}
