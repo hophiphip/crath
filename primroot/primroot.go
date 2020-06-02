@@ -11,6 +11,7 @@ import (
 )
 
 // TODO: Add some theory and explanations
+// TODO: Error handling
 // IMPORTANT!: Input must be prime and is not checked, which is bad ... but it is done for performance
 
 // Primrootp - prim root of p (where p is prime number by default) and p > 2
