@@ -11,16 +11,7 @@ import (
 )
 
 // TODO: Add some theory and explanations
-
-// Some interesting fact 2 and 3 functioins search only for 1 prime root ... this is dull
-
-// p is a modulo of a prime root
-
-// !!! Whether input is prime is not checked, which is bad ... but it is done for performance
-// TODO!!!!: As for the rest numbers use phi(Euler totient function) .
-// .. which I uncounciously actually have done already ... wait ... need some tests to prove it works with every number
-
-// ..and actually not only for performance -- look at the nest functions and their inputs .. get it now ?
+// IMPORTANT!: Input must be prime and is not checked, which is bad ... but it is done for performance
 
 // Primrootp - prim root of p (where p is prime number by default) and p > 2
 func Primrootp(p *big.Int) []*big.Int {
@@ -43,7 +34,7 @@ OuterLoop:
 	for {
 		// The rand approach...
 		// It might be not that great with arbitrary arithmetic
-		// For security purpose use crypto/rand.Int
+		// For security purpose we use crypto/rand.Int
 		a, err := rand.Int(rand.Reader, input)
 		if err != nil {
 			log.Fatal("Error in random big integer generation")
@@ -53,7 +44,7 @@ OuterLoop:
 		}
 
 		for i := big.NewInt(1); i.Cmp(size) <= 0; i.Add(i, one) {
-			// TODO: There exists an alternative to BinaryModulo and you know it...
+			// MIGHT_REQUIRE_A_FIX: There exists an alternative to BinaryModulo and you know it...
 			if modular.BinaryModulo(a, buf.Div(euler, factors[i.Int64()-1]), input).Cmp(one) == 0 {
 				continue OuterLoop
 			}
@@ -68,9 +59,8 @@ OuterLoop:
 			result = append(result, modular.BinaryModulo(result[0], i, input))
 		}
 
-		// we break out of the loop when total amount is reached
+		// We break out of the loop when total amount is reached
 		// might worsen the speed
-		//TODO: add more tests to check it
 		if int64(len(result)) == total {
 			break
 		}
@@ -88,19 +78,17 @@ func Primrootpn(p, n *big.Int) []*big.Int {
 		primrootsp = Primrootp(p)
 		result     = []*big.Int{}
 		//mod        = modular.BinaryExponention(p, n)
-		one  = big.NewInt(1)
-		bufa = big.NewInt(0)
-		bufb = big.NewInt(0)
+		one = big.NewInt(1)
 	)
 
-	// TODO: we dont really need buf we can do: big.NewInt(0).Sub(p, one) for that ..
-	if modular.BinaryModulo(primrootsp[0], bufa.Sub(p, one), bufb.Mul(p, p)).Cmp(one) != 0 {
+	if modular.BinaryModulo(primrootsp[0], big.NewInt(0).Sub(p, one), big.NewInt(0).Mul(p, p)).Cmp(one) != 0 {
 		result = append(result, primrootsp[0])
 	} else {
 		result = append(result, big.NewInt(0).Add(primrootsp[0], p))
 	}
 
-	// TODO: One day I'll be back and change it for the better
+	// TODO: Right now this function returns obly one random primroot
+	// ..it would be better to calculate all of them
 	//bufa.Sub(mod, one)
 	//for i := big.NewInt(2); i.Cmp(mod) < 0; i.Add(i, one) {
 	//	if gcd.Gcd(i, bufa).Cmp(one) == 0 {
@@ -115,13 +103,11 @@ func Primrootpn(p, n *big.Int) []*big.Int {
 func Primroot2pn(p, n *big.Int) []*big.Int {
 	var (
 		buf        = big.NewInt(0)
-		one        = big.NewInt(1)
-		zero       = big.NewInt(0)
 		result     = []*big.Int{}
 		primrootpn = Primrootpn(p, n)
 	)
 
-	if buf.And(primrootpn[0], one).Cmp(zero) != 0 {
+	if buf.And(primrootpn[0], big.NewInt(1)).Cmp(big.NewInt(0)) != 0 {
 		result = append(result, big.NewInt(0).Set(primrootpn[0]))
 	} else {
 		result = append(result, big.NewInt(0).Add(primrootpn[0], modular.BinaryExponention(p, n)))

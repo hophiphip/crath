@@ -17,7 +17,7 @@ type testValuesPn struct {
 	results []*big.Int
 }
 
-// just a help function to conver int array to big.Int array
+// Just a help function to conver int array to big.Int array
 func simpleSliceOfBigInt(values []int) []*big.Int {
 	res := []*big.Int{}
 	for _, val := range values {
@@ -49,6 +49,7 @@ var testsP = []testValues{
 	{big.NewInt(71), simpleSliceOfBigInt([]int{7, 11, 13, 21, 22, 28, 31, 33, 35, 42, 44, 47, 52, 53, 55, 56, 59, 61, 62, 63, 65, 67, 68, 69})},
 }
 
+// TODO: Add tests
 var testsPn = []testValuesPn{
 	{big.NewInt(3), big.NewInt(2), simpleSliceOfBigInt([]int{2, 5})},
 	{big.NewInt(3), big.NewInt(3), simpleSliceOfBigInt([]int{2, 5, 11, 14, 20, 23})},
@@ -62,8 +63,8 @@ func TestPrimrootp(t *testing.T) {
 		res := Primrootp(test.input)
 
 		// A fancy way to sort a slice
-		// ..because of using random big.Int
-		//   the order of the result may differ
+		// because of using random big.Int
+		// the order of the result may differ
 		sort.Slice(res, func(i, j int) bool {
 			return res[i].Cmp(res[j]) < 0
 		})
@@ -89,34 +90,28 @@ func TestPrimrootp(t *testing.T) {
 }
 
 func TestPrimrootpn(t *testing.T) {
+	var isIn bool
 	fmt.Println("Test for TestPrimrootpn")
 
 	for _, test := range testsPn {
 		res := Primrootpn(test.p, test.n)
 
-		// A fancy way to sort a slice
-		// ..because of using random big.Int
-		//   the order of the result may differ
-		sort.Slice(res, func(i, j int) bool {
-			return res[i].Cmp(res[j]) < 0
-		})
-
-		if len(res) != len(test.results) {
-			t.Error(
-				"For", test.p, "and", test.n,
-				"expected", test.results,
-				"got", res,
-			)
-		}
-
-		for i, r := range res {
-			if r.Cmp(test.results[i]) != 0 {
-				t.Error(
-					"For", test.p, "and", test.n,
-					"expected", test.results,
-					"got", res,
-				)
+		// For now it returns only one random primroot
+		// so we check only it
+		isIn = false
+		for _, root := range test.results {
+			if res[0].Cmp(root) == 0 {
+				isIn = true
+				break
 			}
+		}
+		if !isIn {
+			t.Error(
+				"For", test.p,
+				"and", test.n,
+				"primtoot", res[0],
+				"is not found in:", test.results,
+			)
 		}
 	}
 }
