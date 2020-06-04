@@ -27,7 +27,7 @@ func simpleSliceOfBigInt(values []int) []*big.Int {
 }
 
 var testsP = []testValues{
-	//{big.NewInt(2), []*big.Int{big.NewInt(1)}}, <-- it affects everything, as 2 is not checked by default
+	//{big.NewInt(2), []*big.Int{big.NewInt(1)}}, <-- 2 should not be here, as it is not checked by default
 	{big.NewInt(3), []*big.Int{big.NewInt(2)}},
 	{big.NewInt(5), []*big.Int{big.NewInt(2), big.NewInt(3)}},
 	{big.NewInt(7), []*big.Int{big.NewInt(3), big.NewInt(5)}},
@@ -51,16 +51,26 @@ var testsP = []testValues{
 
 // TODO: Add tests
 var testsPn = []testValuesPn{
-	{big.NewInt(3), big.NewInt(2), simpleSliceOfBigInt([]int{2, 5})},
-	{big.NewInt(3), big.NewInt(3), simpleSliceOfBigInt([]int{2, 5, 11, 14, 20, 23})},
-	{big.NewInt(5), big.NewInt(2), simpleSliceOfBigInt([]int{2, 3, 8, 12, 13, 17, 22, 23})},
-	{big.NewInt(7), big.NewInt(2), simpleSliceOfBigInt([]int{3, 5, 10, 12, 17, 24, 26, 33, 38, 40, 45, 47})},
+	/* 9  */ {big.NewInt(3), big.NewInt(2), simpleSliceOfBigInt([]int{2, 5})},
+	/* 27 */ {big.NewInt(3), big.NewInt(3), simpleSliceOfBigInt([]int{2, 5, 11, 14, 20, 23})},
+	/* 25 */ {big.NewInt(5), big.NewInt(2), simpleSliceOfBigInt([]int{2, 3, 8, 12, 13, 17, 22, 23})},
+	/* 49 */ {big.NewInt(7), big.NewInt(2), simpleSliceOfBigInt([]int{3, 5, 10, 12, 17, 24, 26, 33, 38, 40, 45, 47})},
 }
 
 var tests2Pn = []testValuesPn{
-	{big.NewInt(3), big.NewInt(2), simpleSliceOfBigInt([]int{5, 11})},
-	{big.NewInt(3), big.NewInt(3), simpleSliceOfBigInt([]int{5, 11, 23, 29, 41, 47})},
-	{big.NewInt(5), big.NewInt(2), simpleSliceOfBigInt([]int{3, 13, 17, 23, 27, 33, 37, 47})},
+	/* 6  */ {big.NewInt(3), big.NewInt(1), simpleSliceOfBigInt([]int{5})},
+	/* 18 */ {big.NewInt(3), big.NewInt(2), simpleSliceOfBigInt([]int{5, 11})},
+	/* 54 */ {big.NewInt(3), big.NewInt(3), simpleSliceOfBigInt([]int{5, 11, 23, 29, 41, 47})},
+	/* 10 */ {big.NewInt(5), big.NewInt(1), simpleSliceOfBigInt([]int{3, 7})},
+	/* 50 */ {big.NewInt(5), big.NewInt(2), simpleSliceOfBigInt([]int{3, 13, 17, 23, 27, 33, 37, 47})},
+	/* 14 */ {big.NewInt(7), big.NewInt(1), simpleSliceOfBigInt([]int{3, 5})},
+	/* 22 */ {big.NewInt(11), big.NewInt(1), simpleSliceOfBigInt([]int{7, 13, 17, 19})},
+	/* 26 */ {big.NewInt(13), big.NewInt(1), simpleSliceOfBigInt([]int{7, 11, 15, 19})},
+	/* 34 */ {big.NewInt(17), big.NewInt(1), simpleSliceOfBigInt([]int{3, 5, 7, 11, 23, 27, 29, 31})},
+	/* 38 */ {big.NewInt(19), big.NewInt(1), simpleSliceOfBigInt([]int{3, 13, 15, 21, 29, 33})},
+	/* 46 */ {big.NewInt(23), big.NewInt(1), simpleSliceOfBigInt([]int{5, 7, 11, 15, 17, 19, 21, 33, 37, 43})},
+	/* 58 */ {big.NewInt(29), big.NewInt(1), simpleSliceOfBigInt([]int{3, 11, 15, 19, 21, 27, 31, 37, 39, 43, 47, 55})},
+	/* 62 */ {big.NewInt(31), big.NewInt(1), simpleSliceOfBigInt([]int{3, 11, 13, 17, 21, 43, 53, 55})},
 }
 
 func TestPrimrootp(t *testing.T) {
