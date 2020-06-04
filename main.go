@@ -19,4 +19,5 @@ func main() {
 	fmt.Println(primroot.Primrootpn(big.NewInt(3), big.NewInt(2)))
 	fmt.Println(primroot.Primroot2pn(big.NewInt(3), big.NewInt(2)))
 	fmt.Println(modular.BinaryExponention(big.NewInt(3), big.NewInt(10)))
+	fmt.Println(modular.BinaryModulo(big.NewInt(3), big.NewInt(16), big.NewInt(31)))
 }

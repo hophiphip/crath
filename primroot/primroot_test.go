@@ -17,7 +17,7 @@ type testValuesPn struct {
 	results []*big.Int
 }
 
-// Just a help function to conver int array to big.Int array
+// Just a helpfull function to convert int array to big.Int array
 func simpleSliceOfBigInt(values []int) []*big.Int {
 	res := []*big.Int{}
 	for _, val := range values {
@@ -54,6 +54,13 @@ var testsPn = []testValuesPn{
 	{big.NewInt(3), big.NewInt(2), simpleSliceOfBigInt([]int{2, 5})},
 	{big.NewInt(3), big.NewInt(3), simpleSliceOfBigInt([]int{2, 5, 11, 14, 20, 23})},
 	{big.NewInt(5), big.NewInt(2), simpleSliceOfBigInt([]int{2, 3, 8, 12, 13, 17, 22, 23})},
+	{big.NewInt(7), big.NewInt(2), simpleSliceOfBigInt([]int{3, 5, 10, 12, 17, 24, 26, 33, 38, 40, 45, 47})},
+}
+
+var tests2Pn = []testValuesPn{
+	{big.NewInt(3), big.NewInt(2), simpleSliceOfBigInt([]int{5, 11})},
+	{big.NewInt(3), big.NewInt(3), simpleSliceOfBigInt([]int{5, 11, 23, 29, 41, 47})},
+	{big.NewInt(5), big.NewInt(2), simpleSliceOfBigInt([]int{3, 13, 17, 23, 27, 33, 37, 47})},
 }
 
 func TestPrimrootp(t *testing.T) {
@@ -95,6 +102,33 @@ func TestPrimrootpn(t *testing.T) {
 
 	for _, test := range testsPn {
 		res := Primrootpn(test.p, test.n)
+
+		// For now it returns only one random primroot
+		// so we check only it
+		isIn = false
+		for _, root := range test.results {
+			if res[0].Cmp(root) == 0 {
+				isIn = true
+				break
+			}
+		}
+		if !isIn {
+			t.Error(
+				"For", test.p,
+				"and", test.n,
+				"primtoot", res[0],
+				"is not found in:", test.results,
+			)
+		}
+	}
+}
+
+func TestPrimroot2pn(t *testing.T) {
+	var isIn bool
+	fmt.Println("Test for TestPrimroot2pn")
+
+	for _, test := range tests2Pn {
+		res := Primroot2pn(test.p, test.n)
 
 		// For now it returns only one random primroot
 		// so we check only it
