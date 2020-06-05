@@ -127,7 +127,7 @@ func TestProbablySoloveyShtrassen(t *testing.T) {
 			)
 		}
 
-		// In this case 'errt' is type of error
+		// In this case 'errt' is error type
 		res, errt := ProbablySoloveyShtrassen(bigTest, iterCount)
 		if errt != nil {
 			t.Error("For", test.n,
