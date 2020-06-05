@@ -40,20 +40,17 @@ var testValuesBig = []testsBig{
 	{"2848409384090843948239482309480294809238403384232411948192381290480394833890128309128390128309283901283901238901283901283091284189174891273891", false},
 }
 
-func TestPrimetest(t *testing.T) {
+func TestSimplePrimetest(t *testing.T) {
 	fmt.Println("Test for 'SimplePrimetest'")
 
-	for _, test := range testValues {
+	// Skip 0 and 1
+	for _, test := range testValues[2:] {
 		res, err := SimpleTest(test.n)
 
 		if err != nil {
-			if test.n.Cmp(big.NewInt(0)) == 0 || test.n.Cmp(big.NewInt(1)) == 0 {
-				continue
-			} else {
-				t.Error("For", test.n,
-					"unexpected error", err,
-				)
-			}
+			t.Error("For", test.n,
+				"unexpected error", err,
+			)
 		} else {
 			if res != test.result {
 				t.Error("For", test.n,
@@ -79,6 +76,59 @@ func TestPrimetest(t *testing.T) {
 
 		// In this case 'errt' is type of error
 		res, errt := SimpleTest(bigTest)
+		if errt != nil {
+			t.Error("For", test.n,
+				"function returned error", errt,
+			)
+		}
+
+		if res != test.result {
+			t.Error("For", test.n,
+				"expected", test.result,
+				"got", res,
+			)
+		}
+	}
+}
+
+func TestProbablySoloveyShtrassen(t *testing.T) {
+	fmt.Println("Test for 'ProbablySoloveyShtrassen'")
+
+	// Skip 1 and 0
+	for _, test := range testValues[2:] {
+		res, err := ProbablySoloveyShtrassen(test.n)
+
+		if err != nil {
+			t.Error("For", test.n,
+				"unexpected error", err,
+			)
+		} else {
+			if res != test.result {
+				t.Error("For", test.n,
+					"result must be", test.result,
+					"but was", res,
+				)
+			}
+		}
+
+	}
+
+	fmt.Println("Test for 'ProbablySoloveyShtrassen' with big values")
+
+	// With big values we need more iterations than default 20
+	iterCount := 70
+	bigTest := big.NewInt(0)
+	for _, test := range testValuesBig {
+		// In this case 'err' is bool
+		bigTest, err := bigTest.SetString(test.n, 10)
+		if !err {
+			t.Error("For", test.n,
+				"can't convert to big.Int",
+			)
+		}
+
+		// In this case 'errt' is type of error
+		res, errt := ProbablySoloveyShtrassen(bigTest, iterCount)
 		if errt != nil {
 			t.Error("For", test.n,
 				"function returned error", errt,

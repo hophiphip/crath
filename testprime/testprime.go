@@ -1,8 +1,14 @@
 package testprime
 
 import (
+	"crypto/rand"
 	"errors"
+	"fmt"
 	"math/big"
+
+	"math.io/crath/gcd"
+	"math.io/crath/jacobi"
+	"math.io/crath/modular"
 )
 
 // SimpleTest checks whether input argument is a prime number
@@ -53,12 +59,74 @@ func SimpleTest(n *big.Int) (bool, error) {
 	return true, nil
 }
 
-// SoloveyShtrassenTest - checks whether input argument is prime number
-func SoloveyShtrassenTest(n *big.Int) {
+// ProbablySoloveyShtrassen - checks whether input argument is prime number
+// func args:
+//			n          - the number we need to test
+//			iterations - optional argument (by default is 20),
+//						 amount of itearations/tests that will be performed on input
+//
+// returns: true  - input is probably prime
+//			false - input is not prime
+func ProbablySoloveyShtrassen(n *big.Int, iterations ...int) (bool, error) {
+	iterCount := 20
+	if len(iterations) > 0 {
+		iterCount = iterations[0]
+	}
 
+	var (
+		two    = big.NewInt(2)
+		one    = big.NewInt(1)
+		buf    = big.NewInt(0)
+		zero   = big.NewInt(0)
+		jacbig *big.Int
+	)
+
+	// Check if number is 2
+	if n.Cmp(two) == 0 {
+		return true, nil
+	}
+
+	// Check if number is even
+	// before passing it to Jacobi funcion
+	if buf.Mod(n, two).Cmp(zero) == 0 {
+		return false, nil
+	}
+
+	for i := 0; i < iterCount; i++ {
+		a, err := rand.Int(rand.Reader, n)
+		if err != nil {
+			return true, errors.New("Error in random number generation")
+		}
+		if a.Cmp(zero) == 0 {
+			a.Add(a, one)
+		}
+
+		if gcd.Gcd(a, n).Cmp(one) > 0 {
+			return false, nil
+		}
+
+		modulo := modular.BinaryModulo(a, buf.Sub(n, one).Div(buf, two), n)
+		fmt.Println("a ", a, "n ", n)
+		jac, errj := jacobi.Jacobi(a, n)
+		if errj != nil {
+			return true, errors.New("Error in jacobi symbol calculation")
+		}
+
+		if jac == -1 {
+			jacbig = big.NewInt(0).Sub(n, one)
+		} else {
+			jacbig = big.NewInt(1)
+		}
+
+		if jacbig.Cmp(modulo) != 0 {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }
 
-// MillerRabinTest - checks whether input argument is prime number
-func MillerRabinTest(n *big.Int) {
+// ProbablyMillerRabin - checks whether input argument is prime number
+func ProbablyMillerRabin(n *big.Int) {
 
 }
