@@ -3,7 +3,6 @@ package testprime
 import (
 	"crypto/rand"
 	"errors"
-	"fmt"
 	"math/big"
 
 	"math.io/crath/gcd"
@@ -106,7 +105,6 @@ func ProbablySoloveyShtrassen(n *big.Int, iterations ...int) (bool, error) {
 		}
 
 		modulo := modular.BinaryModulo(a, buf.Sub(n, one).Div(buf, two), n)
-		fmt.Println("a ", a, "n ", n)
 		jac, errj := jacobi.Jacobi(a, n)
 		if errj != nil {
 			return true, errors.New("Error in jacobi symbol calculation")
@@ -127,6 +125,79 @@ func ProbablySoloveyShtrassen(n *big.Int, iterations ...int) (bool, error) {
 }
 
 // ProbablyMillerRabin - checks whether input argument is prime number
-func ProbablyMillerRabin(n *big.Int) {
+// func args:
+//			n          - the number we need to test
+//
+// returns: true  - input is probably prime
+//			false - input is not prime
+func ProbablyMillerRabin(n *big.Int, iterations ...int) (bool, error) {
+	iterCount := 6
+	if len(iterations) > 0 {
+		iterCount = iterations[0]
+	}
+
+	var (
+		two    = big.NewInt(2)
+		one    = big.NewInt(1)
+		buf    = big.NewInt(0)
+		zero   = big.NewInt(0)
+		s      = 0
+		q      = big.NewInt(0).Sub(n, one)
+		modulo *big.Int
+	)
+
+	if n.Cmp(two) == 0 {
+		return true, nil
+	}
+
+	if buf.Mod(n, two).Cmp(zero) == 0 {
+		return false, nil
+	}
+
+	for {
+		if buf.And(q, one).Cmp(zero) == 0 {
+			goto NextRandom
+		} else {
+			q.Rsh(q, 1)
+			s++
+		}
+	}
+
+NextRandom:
+	for i := 0; i < iterCount; i++ {
+		a, err := rand.Int(rand.Reader, n)
+		if err != nil {
+			return true, errors.New("Error in random number generation")
+		}
+		// Random mustn't be 0
+		if a.Cmp(zero) == 0 {
+			a.Add(a, one)
+		}
+
+		if gcd.Gcd(a, n).Cmp(one) > 0 {
+			return false, nil
+		}
+
+		modulo = modular.BinaryModulo(a, q, n)
+
+		if modulo.Cmp(one) == 0 || modulo.Cmp(buf.Sub(n, one)) == 0 {
+			continue
+		}
+
+		for j := 1; j < s; j++ {
+			modulo = modular.BinaryModulo(modulo, two, n)
+			if modulo.Cmp(buf.Sub(n, one)) == 0 {
+				goto NextRandom
+			}
+			if modulo.Cmp(one) == 0 {
+				return false, nil
+			}
+		}
+		// Only can be reached if the inner loop was passed and
+		// modulo didn't reach necessay criteria
+		return false, nil
+	}
+
+	return true, nil
 
 }
