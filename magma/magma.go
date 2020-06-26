@@ -6,17 +6,17 @@ import "crypto/cipher"
 const BlockSize = 8
 
 // Internal state of the GOST block cipher
-type _GOST struct {
+type Magma struct {
 	key []uint32 // Encryption key
 	s   [][]byte // S-box provided as parameter
 	k   [][]byte // Expanded s-box
 }
 
-func (g *_GOST) BlockSize() int {
+func (g *Magma) BlockSize() int {
 	return BlockSize
 }
 
-func (g *_GOST) Encrypt(dst, src []byte) {
+func (g *Magma) Encrypt(dst, src []byte) {
 	encSrc := bytesToUint32s(src)
 	encDst := make([]uint32, len(encSrc))
 
@@ -26,7 +26,7 @@ func (g *_GOST) Encrypt(dst, src []byte) {
 	copy(dst, resBytes)
 }
 
-func (g *_GOST) Decrypt(dst, src []byte) {
+func (g *Magma) Decrypt(dst, src []byte) {
 	encSrc := bytesToUint32s(src)
 	encDst := make([]uint32, len(encSrc))
 
@@ -37,7 +37,7 @@ func (g *_GOST) Decrypt(dst, src []byte) {
 }
 
 // GOST block cipher round function
-func (g *_GOST) f(x uint32) uint32 {
+func (g *Magma) f(x uint32) uint32 {
 	x = uint32(g.k[0][(x>>24)&255])<<24 | uint32(g.k[1][(x>>16)&255])<<16 |
 		uint32(g.k[2][(x>>8)&255])<<8 | uint32(g.k[3][x&255])
 
@@ -46,7 +46,7 @@ func (g *_GOST) f(x uint32) uint32 {
 }
 
 // Encrypt one block from src into dst.
-func (g *_GOST) encrypt32(dst, src []uint32) {
+func (g *Magma) encrypt32(dst, src []uint32) {
 	n1, n2 := src[0], src[1]
 
 	n2 = n2 ^ g.f(n1+g.key[0])
@@ -89,7 +89,7 @@ func (g *_GOST) encrypt32(dst, src []uint32) {
 }
 
 // Decrypt one block from src into dst.
-func (g *_GOST) decrypt32(dst, src []uint32) {
+func (g *Magma) decrypt32(dst, src []uint32) {
 	n1, n2 := src[0], src[1]
 
 	n2 = n2 ^ g.f(n1+g.key[0])
@@ -152,7 +152,7 @@ func NewBlockCipher(key []byte, sbox [][]byte) (cipher.Block, error) {
 
 	kbox := sboxExpansion(sbox)
 
-	g := &_GOST{
+	g := &Magma{
 		key: bytesToUint32s(key),
 		s:   sbox,
 		k:   kbox,
