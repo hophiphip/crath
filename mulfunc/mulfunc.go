@@ -132,7 +132,7 @@ func Factorization(input *big.Int) []*big.Int {
 	)
 
 	if num.Cmp(zero) == 0 {
-		log.Fatal(errors.New("Input can't be zero"))
+		log.Fatal(errors.New("input can't be zero"))
 	}
 
 	if num.Cmp(one) == 0 {
@@ -176,7 +176,7 @@ func Uniquefactor(input *big.Int) []*big.Int {
 	)
 
 	if num.Cmp(zero) == 0 {
-		log.Fatal(errors.New("Input can't be zero"))
+		log.Fatal(errors.New("input can't be zero"))
 	}
 
 	if num.Cmp(one) == 0 {
