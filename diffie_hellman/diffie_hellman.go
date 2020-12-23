@@ -34,8 +34,9 @@ type PrivateValues struct {
 	SharedSecret *SharedSecret
 }
 
-// InitPublicStep1 - init public known values: q, n
-func (publicVal *PublicValues) InitPublicStep1() error {
+// Init - init public known values: q, n
+// Step1
+func (publicVal *PublicValues) Init() error {
 	p, err := primegen.Primegen(rand.Reader, publicVal.SmallPrimeBitSize)
 	if err != nil {
 		return err
@@ -54,7 +55,8 @@ func (publicVal *PublicValues) InitPublicStep1() error {
 // InitClientInternalStep1 - init private values
 // 		For example: Alice's - a
 //		..or Bob's - b
-func (privateVal *PrivateValues) InitClientGenerateInternalStep1() error {
+// Step1
+func (privateVal *PrivateValues) InitInternal() error {
 	p, err := primegen.Primegen(rand.Reader, privateVal.initialSecretBitSize)
 	if err != nil {
 		return err
@@ -70,7 +72,8 @@ func (privateVal *PrivateValues) InitClientGenerateInternalStep1() error {
 }
 
 // InitClientSharedStep2 - shared secret generation
-func (privateVal *PrivateValues) InitClientGenerateSharedStep2(publicVal *PublicValues) error {
+// Step2
+func (privateVal *PrivateValues) InitShared(publicVal *PublicValues) error {
 	privateVal.SharedSecret.PersonalSecret = big.NewInt(0).Exp(
 		publicVal.SmallPrime,
 		privateVal.initialSecret,
@@ -79,17 +82,19 @@ func (privateVal *PrivateValues) InitClientGenerateSharedStep2(publicVal *Public
 	return nil
 }
 
-// ExchangeClientSharedStep3 - exchange shared secrets between 2 clients
-func (sharedOne *SharedSecret) ExchangeClientSharedStep3(sharedTwo *SharedSecret) error {
+// Exchange - exchange shared secrets between 2 clients
+// Step3
+func (sharedOne *SharedSecret) Exchange(sharedTwo *SharedSecret) error {
 	sharedOne.ExchangedSecret = big.NewInt(0).Set(sharedTwo.PersonalSecret)
 	sharedTwo.ExchangedSecret = big.NewInt(0).Set(sharedOne.PersonalSecret)
 
 	return nil
 }
 
-// InitClientGenerateFinalStep4 - init final secret keys
+// Finalize - init final secret keys
 // that are equal between 2 clients
-func (privateVal *PrivateValues) InitClientGenerateFinalStep4(publicVal *PublicValues) error {
+// Step4
+func (privateVal *PrivateValues) Finalize(publicVal *PublicValues) error {
 	privateVal.finalSecret = big.NewInt(0).Exp(
 		privateVal.SharedSecret.ExchangedSecret,
 		privateVal.initialSecret,
