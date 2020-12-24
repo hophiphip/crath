@@ -1,4 +1,4 @@
-package asymenc
+package asymsign
 
 import "testing"
 
