@@ -1,9 +1,10 @@
-package diffie_hellman
+package diffiehellman
 
 import (
 	"crypto/rand"
-	"math.io/crath/primegen"
 	"math/big"
+
+	"math.io/crath/primegen"
 )
 
 // NOTE: key is just a big number(big.Int)
@@ -52,7 +53,7 @@ func (publicVal *PublicValues) Init() error {
 	return nil
 }
 
-// InitClientInternalStep1 - init private values
+// InitInternal - init private values
 // 		For example: Alice's - a
 //		..or Bob's - b
 // Step1
@@ -71,7 +72,7 @@ func (privateVal *PrivateValues) InitInternal() error {
 	return nil
 }
 
-// InitClientSharedStep2 - shared secret generation
+// InitShared - shared secret generation
 // Step2
 func (privateVal *PrivateValues) InitShared(publicVal *PublicValues) error {
 	privateVal.SharedSecret.PersonalSecret = big.NewInt(0).Exp(

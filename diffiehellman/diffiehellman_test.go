@@ -1,9 +1,11 @@
-package diffie_hellman
+package diffiehellman
 
-import "testing"
+import (
+	"testing"
+)
 
 var (
-	testCount = 100
+	testCount = 20
 )
 
 func TestExchange(t *testing.T) {
