@@ -18,7 +18,7 @@ var (
 
 func TestMessageConvert(t *testing.T) {
 	for _, testStr := range convertTestValues {
-		if testStr != BigIntToMessage(MessageToBigInt(testStr)) {
+		if testStr != BigIntToString(StringToBigInt(testStr)) {
 			t.Error("For string", testStr,
 				"failed to pack message",
 			)
