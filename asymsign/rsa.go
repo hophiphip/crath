@@ -4,12 +4,15 @@ import (
 	"crypto/md5"
 	"crypto/rand"
 	"fmt"
+	"math/big"
+
 	"math.io/crath/coprime"
 	"math.io/crath/diopheq"
 	"math.io/crath/primegen"
-	"math/big"
 )
 
+// RsaSecret - secret part of rsa context
+// ,must be cept in a secret
 type RsaSecret struct {
 	// p & q
 	secretPrimeP *big.Int
@@ -26,6 +29,7 @@ type RsaSecret struct {
 	pairEuler *big.Int
 }
 
+// RsaPublic - public shareable part of rsa context
 type RsaPublic struct {
 	// e
 	FixedCoPrime *big.Int
@@ -34,16 +38,19 @@ type RsaPublic struct {
 	PairMultiplication *big.Int
 }
 
+// RsaContext full context with it's secret and public part
 type RsaContext struct {
 	secret *RsaSecret
 	Public *RsaPublic
 }
 
+// SignedMessage contains message & sign
 type SignedMessage struct {
 	message string
 	sign    *big.Int
 }
 
+// Init - initializes RSA context
 func (ctx *RsaContext) Init() error {
 	// Init p
 	secret, err := primegen.Primegen(rand.Reader, ctx.secret.secretBitSize)
@@ -94,6 +101,7 @@ func (ctx *RsaContext) Init() error {
 	return nil
 }
 
+// Sign - signs message
 func (ctx *RsaContext) Sign(message string) (*SignedMessage, error) {
 	smes := &SignedMessage{
 		message: "",
@@ -110,6 +118,7 @@ func (ctx *RsaContext) Sign(message string) (*SignedMessage, error) {
 	return smes, nil
 }
 
+// Verify - verifies message sign
 func (smes *SignedMessage) Verify(pub *RsaPublic) bool {
 	hash := big.NewInt(0).Mod(fixedHash(smes.message), pub.PairMultiplication)
 
@@ -129,7 +138,7 @@ func (smes *SignedMessage) Verify(pub *RsaPublic) bool {
 }
 
 func fixedHash(message string) *big.Int {
-	// Converts md5 byte[16] to byte[] (slice)
+	// Converts md5 byte[16] result value to byte[] (slice)
 	fixedHash := md5.Sum([]byte(message))
 	return big.NewInt(0).SetBytes(fixedHash[:])
 }
