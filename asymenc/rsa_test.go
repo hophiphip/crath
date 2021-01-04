@@ -1,4 +1,4 @@
-package asymsign
+package asymenc
 
 import "testing"
 
@@ -18,7 +18,7 @@ var (
 	initEveryTime = false
 )
 
-func TestRsaSign(t *testing.T) {
+func TestRsaEncryption(t *testing.T) {
 	ctx := RsaContext{
 		secret: &RsaSecret{
 			secretPrimeP:  nil,
@@ -40,18 +40,18 @@ func TestRsaSign(t *testing.T) {
 			}
 		}
 
-		smes, err := ctx.Sign(text)
-		if err != nil {
-			t.Error("Failed to sign message:", text, ",on iteration:", i)
-		}
+		publicKey := ctx.Public.GetPublicKey()
+		privateKey := ctx.secret.GetPrivateKey()
 
-		if smes == nil {
-			t.Error("Signed message is nil:", text, ",on iteration:", i)
-		} else {
-			if !smes.Verify(ctx.Public) {
-				t.Error("Signature rejected on message:", text, ",on iteration", i,
-					"sign:")
-			}
+		encrypted := publicKey.Encrypt(text)
+		decrypted := privateKey.Decrypt(encrypted, publicKey)
+
+		if decrypted != text {
+			t.Error(
+				"For iteration", i,
+				"decrypted message:", decrypted,
+				"not equal to:", text,
+			)
 		}
 	}
 }

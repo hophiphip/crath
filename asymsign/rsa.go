@@ -3,7 +3,6 @@ package asymsign
 import (
 	"crypto/md5"
 	"crypto/rand"
-	"fmt"
 	"math/big"
 
 	"math.io/crath/coprime"
@@ -128,11 +127,11 @@ func (smes *SignedMessage) Verify(pub *RsaPublic) bool {
 		pub.PairMultiplication)
 
 	// TODO: remove debug print
-	fmt.Println(smes.message)
-	fmt.Println(smes.sign)
-	fmt.Println(fixedHash(smes.message))
-	fmt.Println(hash)
-	fmt.Println(mod)
+	//fmt.Println(smes.message)
+	//fmt.Println(smes.sign)
+	//fmt.Println(fixedHash(smes.message))
+	//fmt.Println(hash)
+	//fmt.Println(mod)
 
 	return mod.Cmp(hash) == 0
 }
