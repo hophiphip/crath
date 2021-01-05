@@ -1,12 +1,8 @@
-package main
+package bitcommit
 
 import (
-	"crypto/rand"
 	"fmt"
-	"log"
 	"math/big"
-
-	"math.io/crath/primegen"
 )
 
 var (
@@ -71,25 +67,25 @@ final:
 	return ret
 }
 
-func main() {
-	buf := big.NewInt(0)
-
-	// Generate prime number p
-	p, err := primegen.Primegen(rand.Reader, keySize)
-	if err != nil {
-		log.Fatal("failed to generate key (p)")
-	}
-
-	// D
-	fmt.Println("P size:", len(p.Bytes()))
-	// D
-
-	// Choose q: p - 1 = 0 (mod q) , q is 160 bits long
-	q := findQ(p)
-
-	// D
-	fmt.Println("Mod:", buf.Mod(buf.Sub(p, one), q))
-	fmt.Println("Q size:", len(q.Bytes()))
-	fmt.Println("P size:", len(p.Bytes()))
-	// D
-}
+//func main() {
+//	buf := big.NewInt(0)
+//
+//	// Generate prime number p
+//	p, err := primegen.Primegen(rand.Reader, keySize)
+//	if err != nil {
+//		log.Fatal("failed to generate key (p)")
+//	}
+//
+//	// D
+//	fmt.Println("P size:", len(p.Bytes()))
+//	// D
+//
+//	// Choose q: p - 1 = 0 (mod q) , q is 160 bits long
+//	q := findQ(p)
+//
+//	// D
+//	fmt.Println("Mod:", buf.Mod(buf.Sub(p, one), q))
+//	fmt.Println("Q size:", len(q.Bytes()))
+//	fmt.Println("P size:", len(p.Bytes()))
+//	// D
+//}
