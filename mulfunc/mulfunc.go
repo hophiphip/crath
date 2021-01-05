@@ -107,6 +107,8 @@ func Euler(input *big.Int) (res *big.Int) {
 			}
 			res.Sub(res, buf.Div(res, p))
 		}
+
+		// Set next jump index
 		if i == 7 {
 			i = 0
 		} else {
