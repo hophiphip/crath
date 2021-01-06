@@ -14,8 +14,8 @@ var (
 	hashSha256 = curve.Hash()
 )
 
-// SchnorrContext - public & private keys
-type SchnorrContext struct {
+// SchnorrContextECC - public & private keys
+type SchnorrContextECC struct {
 	privateKey kyber.Scalar
 	PublicKey  kyber.Point
 }
@@ -35,21 +35,21 @@ func hash(s string) kyber.Scalar {
 }
 
 // NewCtx - generates schnorr context with public & private keys
-func NewCtx() SchnorrContext {
+func NewCtx() SchnorrContextECC {
 	private := curve.Scalar().Pick(curve.RandomStream())
-	return SchnorrContext{
+	return SchnorrContextECC{
 		privateKey: private,
 		PublicKey:  curve.Point().Mul(private, curve.Point().Base()),
 	}
 }
 
 // ComparePublic - compares public key with another
-func (context SchnorrContext) ComparePublic(derivedPublicKey kyber.Point) bool {
+func (context SchnorrContextECC) ComparePublic(derivedPublicKey kyber.Point) bool {
 	return context.PublicKey.Equal(derivedPublicKey)
 }
 
 // Sign - signs message
-func (context SchnorrContext) Sign(message string) Signature {
+func (context SchnorrContextECC) Sign(message string) Signature {
 	// Base of the curve
 	g := curve.Point().Base()
 

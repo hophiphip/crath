@@ -1,15 +1,22 @@
 package bitcommit
 
+// Definetly not the best and not the fastest solution
+// For better example look at ECDSA implementation
+
 import (
-	"fmt"
+	"crypto/rand"
 	"math/big"
+
+	"math.io/crath/primegen"
 )
 
 var (
+	// KeySize - big-key bit size
 	// p size
-	keySize = 1024
+	KeySize = 1024
+	// SmallKeySize - small-key bit size
 	// q size
-	smallKeySize = 160
+	SmallKeySize = 160
 
 	zero  = big.NewInt(0)
 	one   = big.NewInt(1)
@@ -20,72 +27,70 @@ var (
 	six   = big.NewInt(6)
 )
 
-func findQ(prime *big.Int) *big.Int {
-	// buffer for calculations
-	buf := big.NewInt(0)
-	// result value - Q
-	ret := big.NewInt(0)
+// NOTE: this imlpementation doesn't bother about 160 bits small-key size, but uses the first found one
 
-	// We need: p - 1
-	num := big.NewInt(0).Sub(prime, one)
-
-	for _, p := range [3]*big.Int{two, three, five} {
-		if buf.Mod(num, p).Cmp(zero) == 0 {
-			ret.Set(p)
-			num.Div(num, p)
-		}
-	}
-
-	iteration := 0
-	for p, i, jumps := big.NewInt(7), -1, [8]*big.Int{four, two, four, two, four, six, two, six}; buf.Mul(p, p).Cmp(num) <= 0; p.Add(p, jumps[i]) {
-		if buf.Mod(num, p).Cmp(zero) == 0 {
-			ret.Set(p)
-			num.Div(num, p)
-		}
-
-		if len(ret.Bytes()) >= smallKeySize {
-			goto final
-		}
-
-		// Set next jump index
-		if i == 7 {
-			i = 0
-		} else {
-			i++
-		}
-
-		// DEBUG
-		if iteration%100000 == 0 {
-			fmt.Println("[DEBUG] ITERATION:[", iteration, "] Q:[", ret, "] SIZE:[", len(ret.Bytes()), "]")
-		}
-		// DEBUG
-		iteration++
-	}
-
-final:
-
-	return ret
+// SchnorrContext - contains public & private values for keys
+type SchnorrContext struct {
+	q  *big.Int
+	qp *big.Int
+	p  *big.Int
+	a  *big.Int
+	g  *big.Int
 }
 
-//func main() {
-//	buf := big.NewInt(0)
-//
-//	// Generate prime number p
-//	p, err := primegen.Primegen(rand.Reader, keySize)
-//	if err != nil {
-//		log.Fatal("failed to generate key (p)")
-//	}
-//
-//	// D
-//	fmt.Println("P size:", len(p.Bytes()))
-//	// D
-//
-//	// Choose q: p - 1 = 0 (mod q) , q is 160 bits long
-//	q := findQ(p)
-//
-//	// D
-//	fmt.Println("Mod:", buf.Mod(buf.Sub(p, one), q))
-//	fmt.Println("Q size:", len(q.Bytes()))
-//	fmt.Println("P size:", len(p.Bytes()))
-//	// D
-//}
+// Init - define all values for context
+func (ctx *SchnorrContext) Init() error {
+	// Will check whether number is a prime one with certainty:  1 - 1/2*certainty
+	certainty := 100
+
+	_q, err := primegen.Primegen(rand.Reader, KeySize)
+	if err != nil {
+		return err
+	}
+
+	ctx.q.Set(_q)
+	ctx.qp.Set(one)
+
+	for {
+		// p := 2*(q * qp) + 1
+		ctx.p.Mul(ctx.q, ctx.qp)
+		ctx.p.Mul(ctx.p, two)
+		ctx.p.Add(ctx.p, one)
+
+		if ctx.p.ProbablyPrime(certainty) {
+			break
+		}
+
+		ctx.qp.Add(ctx.qp, one)
+	}
+
+	for {
+		// (2+a) mod p
+		_a, err := primegen.Primegen(rand.Reader, SmallKeySize)
+		if err != nil {
+			return err
+		}
+		_a.Add(_a, two)
+		_a.Mod(_a, ctx.p)
+		ctx.a.Set(_a)
+
+		// (p - 1)/q
+		ga := big.NewInt(0).Sub(ctx.p, one)
+		ga.Div(ga, ctx.q)
+
+		// a^ga mod p
+		ctx.g.Exp(ctx.a, ga, ctx.p)
+
+		// g != 1
+		if ctx.g.Cmp(one) != 0 {
+			break
+		}
+	}
+
+	return nil
+}
+
+// Test ...
+func Test() {
+
+}
