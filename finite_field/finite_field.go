@@ -8,6 +8,9 @@ import (
 	"strconv"
 )
 
+const px = 0x1D // 00011101 -> a⁴ + a³ + a² + 1
+// a⁸ = a⁴ + a³ + a² + 1
+
 var numberToSuperscript = map[rune]string{
 	'0': "⁰",
 	'1': "¹",
@@ -53,7 +56,7 @@ func intToSuperscript(n int) (string, error) {
 }
 
 // bigBitsToPolynomial - converts big.Int bits to polynomial representation string
-func bitsToPolynomial(n big.Int) (string, error) {
+func bigBitsToPolynomial(n big.Int) (string, error) {
 	var buffer bytes.Buffer
 
 	nBytes := n.Bytes()
@@ -90,6 +93,62 @@ func bitsToPolynomial(n big.Int) (string, error) {
 	return buffer.String(), nil
 }
 
+func fieldAdd(a, b *big.Int) big.Int {
+	return *big.NewInt(0).Xor(a, b)
+}
+
+func fieldMul8Aplha(b *big.Int) (big.Int, error) {
+	ret := big.NewInt(0)
+
+	bBytes := b.Bytes()
+
+	if len(bBytes) > 1 {
+		return *ret, fmt.Errorf("element must be from field: 2⁸: %s", b.String())
+	}
+
+	if ((bBytes[0] >> 7) & 1) == 1 {
+		ret.SetBytes([]byte{(bBytes[0] << 1) ^ 0x1D})
+	} else {
+		ret.SetBytes([]byte{bBytes[0] << 1})
+	}
+
+	return *ret, nil
+}
+
+func fieldMul8(a, b *big.Int) (big.Int, error) {
+	ret := big.NewInt(0)
+
+	aBytes := a.Bytes()
+	bBytes := b.Bytes()
+
+	if len(bBytes) > 1 || len(aBytes) > 1 {
+		return *ret, fmt.Errorf("elements must be from field: 2⁸")
+	}
+
+	deg := aBytes[0]
+	byteRes := byte(0)
+
+	if bBytes[0]&1 == 1 {
+		byteRes = aBytes[0]
+	}
+
+	for i := 1; i < 8; i++ {
+		if ((deg >> 7) & 1) == 1 {
+			deg = (deg << 1) ^ px
+		} else {
+			deg <<= 1
+		}
+
+		if (bBytes[0]>>i)&1 == 1 {
+			byteRes ^= deg
+		}
+	}
+
+	ret.SetBytes([]byte{byteRes})
+
+	return *ret, nil
+}
+
 func main() {
 	if str, err := bigToSuperscript(*big.NewInt(1234567890)); err != nil {
 		log.Println(err)
@@ -103,9 +162,35 @@ func main() {
 		log.Println(str)
 	}
 
-	if str, err := bitsToPolynomial(*big.NewInt(0xeeff)); err != nil {
+	if str, err := bigBitsToPolynomial(*big.NewInt(0xeeff)); err != nil {
 		log.Println(err)
 	} else {
 		log.Println(str)
+	}
+
+	if mul, err := fieldMul8Aplha(big.NewInt(0xaa)); err != nil {
+		log.Println(err)
+	} else {
+		if str, errS := bigBitsToPolynomial(mul); errS != nil {
+			log.Println(errS)
+		} else {
+			log.Println(str)
+		}
+	}
+
+	if mul, err := fieldMul8Aplha(big.NewInt(0xaabb)); err != nil {
+		log.Println(err)
+	} else {
+		log.Println(bigBitsToPolynomial(mul))
+	}
+
+	if mul, err := fieldMul8(big.NewInt(0b0000111), big.NewInt(0b1001000)); err != nil {
+		log.Println(err)
+	} else {
+		if str, errS := bigBitsToPolynomial(mul); errS != nil {
+			log.Println(errS)
+		} else {
+			log.Println(str)
+		}
 	}
 }

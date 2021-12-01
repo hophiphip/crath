@@ -13,6 +13,7 @@ type testCase struct {
 
 var tests = []testCase{
 	{big.NewInt(2), big.NewInt(11), big.NewInt(10)},
+	{big.NewInt(3), big.NewInt(11), big.NewInt(5)}, // 10
 }
 
 func TestOrd(t *testing.T) {
