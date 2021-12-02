@@ -14,11 +14,20 @@ type testCase struct {
 var tests = []testCase{
 	{big.NewInt(2), big.NewInt(11), big.NewInt(10)},
 	{big.NewInt(3), big.NewInt(11), big.NewInt(5)}, // 10
+	//{big.NewInt(2), big.NewInt(10), big.NewInt(2)}, // ifinite loop ?
 }
 
 func TestOrd(t *testing.T) {
 	for _, test := range tests {
-		val := Ord(test.groupElement, test.module)
+		val, err := Ord(test.groupElement, test.module)
+		if err != nil {
+			t.Error(
+				"For element: ", test.groupElement.String(),
+				" and module: ", test.module.String(),
+				" got error: ", err,
+			)
+		}
+
 		if val.Cmp(test.order) != 0 {
 			t.Error(
 				"For element: ", test.groupElement.String(),

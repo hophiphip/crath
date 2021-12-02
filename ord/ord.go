@@ -1,8 +1,10 @@
 package ord
 
 import (
+	"fmt"
 	"math/big"
 
+	"math.io/crath/gcd"
 	"math.io/crath/mulfunc"
 )
 
@@ -40,7 +42,11 @@ func coolFactorization(value *big.Int) []Pair {
 // Ord - Element order function
 // g - element
 // m - module
-func Ord(g, m *big.Int) *big.Int {
+func Ord(g, m *big.Int) (*big.Int, error) {
+	if gcd.Gcd(g, m).Cmp(big.NewInt(1)) != 0 {
+		return nil, fmt.Errorf("incorrect element: %s, for field of size: %s", g.String(), m.String())
+	}
+
 	N := mulfunc.Euler(m)
 	n := coolFactorization(N)
 
@@ -54,8 +60,9 @@ func Ord(g, m *big.Int) *big.Int {
 		for one.Cmp(b) != 0 {
 			b.Exp(b, factor.first, m)
 			d.Mul(d, factor.first)
+			d.Mod(d, m)
 		}
 	}
 
-	return d
+	return d, nil
 }

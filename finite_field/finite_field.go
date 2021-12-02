@@ -8,7 +8,9 @@ import (
 	"strconv"
 )
 
-const px = 0x1D // 00011101 -> a⁴ + a³ + a² + 1
+// Only for field 2^8
+
+const defaultPx = 0x1D // 00011101 -> a⁴ + a³ + a² + 1
 // a⁸ = a⁴ + a³ + a² + 1
 
 var numberToSuperscript = map[rune]string{
@@ -33,7 +35,7 @@ func bigToSuperscript(n big.Int) (string, error) {
 		if val, isIn := numberToSuperscript[c]; isIn {
 			buffer.WriteString(val)
 		} else {
-			return "", fmt.Errorf("Incorrect integer: %d, this is not supposed to happen", c)
+			return "", fmt.Errorf("incorrect integer: %d, this is not supposed to happen", c)
 		}
 	}
 
@@ -48,8 +50,45 @@ func intToSuperscript(n int) (string, error) {
 		if val, isIn := numberToSuperscript[c]; isIn {
 			buffer.WriteString(val)
 		} else {
-			return "", fmt.Errorf("Incorrect integer: %d, this is not supposed to happen", c)
+			return "", fmt.Errorf("incorrect integer: %d, this is not supposed to happen", c)
 		}
+	}
+
+	return buffer.String(), nil
+}
+
+// byteToSuperscript - converts byte to superscript string
+func byteToPolynomial(n byte) (string, error) {
+	var buffer bytes.Buffer
+	wasSthPrinted := false
+	nBitCount := 7
+
+	for _, b := range fmt.Sprintf("%08b", n) {
+		if b == '1' {
+			log.Println(nBitCount)
+
+			if wasSthPrinted {
+				buffer.WriteString(" + ")
+			}
+
+			if nBitCount == 0 {
+				buffer.WriteString("1")
+			} else {
+				buffer.WriteString("x")
+				if nBitCount != 1 {
+					if str, err := intToSuperscript(nBitCount); err != nil {
+						return "", err
+					} else {
+						log.Println(str)
+						buffer.WriteString(str)
+					}
+				}
+			}
+
+			wasSthPrinted = true
+		}
+
+		nBitCount--
 	}
 
 	return buffer.String(), nil
@@ -93,10 +132,6 @@ func bigBitsToPolynomial(n big.Int) (string, error) {
 	return buffer.String(), nil
 }
 
-func fieldAdd(a, b *big.Int) big.Int {
-	return *big.NewInt(0).Xor(a, b)
-}
-
 func fieldMul8Aplha(b *big.Int) (big.Int, error) {
 	ret := big.NewInt(0)
 
@@ -134,7 +169,7 @@ func fieldMul8(a, b *big.Int) (big.Int, error) {
 
 	for i := 1; i < 8; i++ {
 		if ((deg >> 7) & 1) == 1 {
-			deg = (deg << 1) ^ px
+			deg = (deg << 1) ^ defaultPx
 		} else {
 			deg <<= 1
 		}
@@ -147,6 +182,33 @@ func fieldMul8(a, b *big.Int) (big.Int, error) {
 	ret.SetBytes([]byte{byteRes})
 
 	return *ret, nil
+}
+
+// Product if elementis in GF(2^8) with p(x)
+// Example p(x) = x^8 + x^4 + x^3 + x^2 + 1
+// 				--> px = 0001_1101 --> 0b00011101
+// mulG_2_8 - multiplication of elements in field GF(2^8)
+func mulG_2_8(a, b, px byte) byte {
+	deg := a
+	res := byte(0)
+
+	if (b & 1) != 0 {
+		res = a
+	}
+
+	for i := 1; i < 8; i++ {
+		if ((deg >> 7) & 1) != 0 {
+			deg = (deg << 1) ^ px
+		} else {
+			deg <<= 1
+		}
+
+		if ((b >> i) & 1) != 0 {
+			res ^= deg
+		}
+	}
+
+	return res
 }
 
 func main() {
@@ -192,5 +254,11 @@ func main() {
 		} else {
 			log.Println(str)
 		}
+	}
+
+	if str, err := byteToPolynomial(0b00011101); err != nil {
+		log.Println(err)
+	} else {
+		log.Println(str)
 	}
 }
