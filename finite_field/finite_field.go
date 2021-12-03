@@ -1,4 +1,4 @@
-package main
+package finitefield
 
 import (
 	"bytes"
@@ -211,54 +211,6 @@ func mulG_2_8(a, b, px byte) byte {
 	return res
 }
 
-func main() {
-	if str, err := bigToSuperscript(*big.NewInt(1234567890)); err != nil {
-		log.Println(err)
-	} else {
-		log.Println(str)
-	}
-
-	if str, err := intToSuperscript(1234567890); err != nil {
-		log.Println(err)
-	} else {
-		log.Println(str)
-	}
-
-	if str, err := bigBitsToPolynomial(*big.NewInt(0xeeff)); err != nil {
-		log.Println(err)
-	} else {
-		log.Println(str)
-	}
-
-	if mul, err := fieldMul8Aplha(big.NewInt(0xaa)); err != nil {
-		log.Println(err)
-	} else {
-		if str, errS := bigBitsToPolynomial(mul); errS != nil {
-			log.Println(errS)
-		} else {
-			log.Println(str)
-		}
-	}
-
-	if mul, err := fieldMul8Aplha(big.NewInt(0xaabb)); err != nil {
-		log.Println(err)
-	} else {
-		log.Println(bigBitsToPolynomial(mul))
-	}
-
-	if mul, err := fieldMul8(big.NewInt(0b0000111), big.NewInt(0b1001000)); err != nil {
-		log.Println(err)
-	} else {
-		if str, errS := bigBitsToPolynomial(mul); errS != nil {
-			log.Println(errS)
-		} else {
-			log.Println(str)
-		}
-	}
-
-	if str, err := byteToPolynomial(0b00011101); err != nil {
-		log.Println(err)
-	} else {
-		log.Println(str)
-	}
+func addG_2_8(a, b byte) byte {
+	return a ^ b
 }
