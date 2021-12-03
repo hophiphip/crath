@@ -28,9 +28,14 @@ func getOrd(ctx *gin.Context) {
 		return
 	}
 
-	solution := ord.Ord(g, m)
-
-	ctx.IndentedJSON(http.StatusOK, gin.H{
-		"solution": solution.String(),
-	})
+	solution, err := ord.Ord(g, m)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "incorrect element",
+		})
+	} else {
+		ctx.IndentedJSON(http.StatusOK, gin.H{
+			"solution": solution.String(),
+		})
+	}
 }

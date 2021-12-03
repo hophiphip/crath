@@ -14,7 +14,8 @@ type testCase struct {
 
 var tests = []testCase{
 	{big.NewInt(2), big.NewInt(11), big.NewInt(10)},
-	{big.NewInt(3), big.NewInt(11), big.NewInt(5)}, // 10
+	{big.NewInt(3), big.NewInt(10), big.NewInt(4)},
+	{big.NewInt(3), big.NewInt(10), big.NewInt(10)},
 	{big.NewInt(2), big.NewInt(10), big.NewInt(2)},
 }
 
@@ -24,7 +25,7 @@ func TestOrd(t *testing.T) {
 		// Not an error but a warning
 		if err != nil {
 			fmt.Println(
-				"For element: ", test.groupElement.String(),
+				"WARN: For element: ", test.groupElement.String(),
 				" and module: ", test.module.String(),
 				" got error: ", err,
 			)
