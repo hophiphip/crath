@@ -214,3 +214,25 @@ func mulG_2_8(a, b, px byte) byte {
 func addG_2_8(a, b byte) byte {
 	return a ^ b
 }
+
+// bitStringToByte - Simple temporary bit string to byte converter
+func bitStringToByte(bitString string) (byte, error) {
+	if len(bitString) != 8 {
+		return 0, fmt.Errorf("incorrect string length, expected: %d, but got: %d", 8, len(bitString))
+	}
+
+	var res byte = 0
+
+	for idx, bit := range bitString {
+		switch bit {
+		case '0':
+			continue
+		case '1':
+			res |= byte(1) << (7 - idx)
+		default:
+			return 0, fmt.Errorf("incorrect string symbol on position: %d", idx)
+		}
+	}
+
+	return res, nil
+}

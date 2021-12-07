@@ -202,3 +202,28 @@ func TestField(t *testing.T) {
 		}
 	}()
 }
+
+func TestBitStringToByte(t *testing.T) {
+	for num := byte(0); ; num++ {
+		input := fmt.Sprintf("%08b", num)
+
+		if res, err := bitStringToByte(input); err != nil {
+			t.Error(
+				"For input: ", input,
+				" got an error: ", err,
+			)
+		} else {
+			if res != num {
+				t.Error(
+					"For input: ", input,
+					" expected: ", num,
+					" but got: ", res,
+				)
+			}
+		}
+
+		if num == byte(0b1111_1111) {
+			break
+		}
+	}
+}
