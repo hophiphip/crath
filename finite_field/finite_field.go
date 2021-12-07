@@ -187,8 +187,8 @@ func fieldMul8(a, b *big.Int) (big.Int, error) {
 // Product if elementis in GF(2^8) with p(x)
 // Example p(x) = x^8 + x^4 + x^3 + x^2 + 1
 // 				--> px = 0001_1101 --> 0b00011101
-// mulG_2_8 - multiplication of elements in field GF(2^8)
-func mulG_2_8(a, b, px byte) byte {
+// MulG_2_8 - multiplication of elements in field GF(2^8)
+func MulG_2_8(a, b, px byte) byte {
 	deg := a
 	res := byte(0)
 
@@ -211,12 +211,13 @@ func mulG_2_8(a, b, px byte) byte {
 	return res
 }
 
-func addG_2_8(a, b byte) byte {
+// Add two elements from GF(2^8s)
+func AddG_2_8(a, b byte) byte {
 	return a ^ b
 }
 
-// bitStringToByte - Simple temporary bit string to byte converter
-func bitStringToByte(bitString string) (byte, error) {
+// BitStringToByte - Simple temporary bit string to byte converter
+func BitStringToByte(bitString string) (byte, error) {
 	if len(bitString) != 8 {
 		return 0, fmt.Errorf("incorrect string length, expected: %d, but got: %d", 8, len(bitString))
 	}

@@ -111,7 +111,7 @@ func TestBitsToPolynomial(t *testing.T) {
 
 func TestAddG_2_8(t *testing.T) {
 	for _, testCase := range fieldAddOperationTestCases {
-		if res := addG_2_8(testCase.a, testCase.b); res != testCase.output {
+		if res := AddG_2_8(testCase.a, testCase.b); res != testCase.output {
 			t.Error(
 				"For values: ", testCase.a,
 				" and: ", testCase.b,
@@ -124,7 +124,7 @@ func TestAddG_2_8(t *testing.T) {
 
 func TestMulG_2_8(t *testing.T) {
 	for _, testCase := range fieldMulOperationTestCases {
-		if res := mulG_2_8(testCase.a, testCase.b, testCase.px); res != testCase.output {
+		if res := MulG_2_8(testCase.a, testCase.b, testCase.px); res != testCase.output {
 			t.Error(
 				"For values: ", testCase.a,
 				" and: ", testCase.b,
@@ -152,7 +152,7 @@ func TestField(t *testing.T) {
 	for a := byte(0b0000_0000); ; a++ {
 
 		for b := byte(0b0000_0000); ; b++ {
-			wa.WriteString(fmt.Sprintf("%08b", addG_2_8(a, b)))
+			wa.WriteString(fmt.Sprintf("%08b", AddG_2_8(a, b)))
 			wa.WriteString("\t")
 
 			if b == byte(0b1111_1111) {
@@ -177,7 +177,7 @@ func TestField(t *testing.T) {
 	for a := byte(0b0000_0000); ; a++ {
 
 		for b := byte(0b0000_0000); ; b++ {
-			wm.WriteString(fmt.Sprintf("%08b", mulG_2_8(a, b, px)))
+			wm.WriteString(fmt.Sprintf("%08b", MulG_2_8(a, b, px)))
 			wm.WriteString("\t")
 
 			if b == byte(0b1111_1111) {
@@ -207,7 +207,7 @@ func TestBitStringToByte(t *testing.T) {
 	for num := byte(0); ; num++ {
 		input := fmt.Sprintf("%08b", num)
 
-		if res, err := bitStringToByte(input); err != nil {
+		if res, err := BitStringToByte(input); err != nil {
 			t.Error(
 				"For input: ", input,
 				" got an error: ", err,
@@ -224,6 +224,15 @@ func TestBitStringToByte(t *testing.T) {
 
 		if num == byte(0b1111_1111) {
 			break
+		}
+	}
+
+	for _, input := range []string{"0000", "0ada", "11111111111", "adasdjasl", "asdasdasd", "0000111a", ""} {
+		if res, err := BitStringToByte(input); err == nil {
+			t.Error(
+				"For input: ", input,
+				" expected error but got: ", res,
+			)
 		}
 	}
 }
