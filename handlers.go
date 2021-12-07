@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"math/big"
 	"net/http"
 
@@ -16,15 +17,19 @@ func getOrd(ctx *gin.Context) {
 		return
 	}
 
+	log.Println(input.Module)
+
 	g, isSet := big.NewInt(0).SetString(input.Element, 0)
 	if !isSet || g == nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "incorrect element"})
 		return
 	}
 
+	log.Println(g.String())
+
 	m, isSet := big.NewInt(0).SetString(input.Module, 0)
-	if !isSet || m == nil || !m.ProbablyPrime(1) {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "incorrect module"})
+	if !isSet || m == nil {
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"error": "could not parse module"})
 		return
 	}
 

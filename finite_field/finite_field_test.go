@@ -1,7 +1,10 @@
 package finitefield
 
 import (
+	"bufio"
+	"fmt"
 	"math/big"
+	"os"
 	"testing"
 )
 
@@ -131,4 +134,71 @@ func TestMulG_2_8(t *testing.T) {
 			)
 		}
 	}
+}
+
+func TestField(t *testing.T) {
+	testAddFile := "test.add.txt"
+	testMulFile := "test.mul.txt"
+
+	px := byte(0b0001_0111)
+
+	fa, err := os.Create(testAddFile)
+	if err != nil {
+		t.Error(err)
+	}
+
+	wa := bufio.NewWriter(fa)
+
+	for a := byte(0b0000_0000); ; a++ {
+
+		for b := byte(0b0000_0000); ; b++ {
+			wa.WriteString(fmt.Sprintf("%08b", addG_2_8(a, b)))
+			wa.WriteString("\t")
+
+			if b == byte(0b1111_1111) {
+				wa.WriteString("\n")
+				break
+			}
+		}
+
+		if a == byte(0b1111_1111) {
+			wa.WriteString("\n")
+			break
+		}
+	}
+
+	fm, err := os.Create(testMulFile)
+	if err != nil {
+		t.Error(err)
+	}
+
+	wm := bufio.NewWriter(fm)
+
+	for a := byte(0b0000_0000); ; a++ {
+
+		for b := byte(0b0000_0000); ; b++ {
+			wm.WriteString(fmt.Sprintf("%08b", mulG_2_8(a, b, px)))
+			wm.WriteString("\t")
+
+			if b == byte(0b1111_1111) {
+				wm.WriteString("\n")
+				break
+			}
+		}
+
+		if a == byte(0b1111_1111) {
+			wm.WriteString("\n")
+			break
+		}
+	}
+
+	defer func() {
+		if err := fa.Close(); err != nil {
+			t.Error(err)
+		}
+
+		if err := fm.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
 }

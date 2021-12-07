@@ -15,7 +15,8 @@ type testCase struct {
 var tests = []testCase{
 	{big.NewInt(2), big.NewInt(11), big.NewInt(10)},
 	{big.NewInt(3), big.NewInt(10), big.NewInt(4)},
-	{big.NewInt(2), big.NewInt(10), big.NewInt(2)},
+	{big.NewInt(17), big.NewInt(100), big.NewInt(20)},
+	{big.NewInt(2), big.NewInt(10), big.NewInt(2)}, // will cause an error as gcd(2, 10) != 1
 }
 
 func TestOrd(t *testing.T) {
