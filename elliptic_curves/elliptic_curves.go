@@ -90,13 +90,32 @@ func (c *SimpleCurve) AddPoints(a, b Point) Point {
 		result.X.Set(x3)
 
 		y2 := big.NewInt(0).Set(a.X)
-		y2.Sub(y2, x3)
+		y2.Sub(y2, x3).Mod(y2, c.M)
 		y2.Mul(y2, k)
 		y2.Sub(y2, a.Y).Mod(y2, c.M)
 
 		result.Y.Set(y2)
 	} else {
+		k := big.NewInt(0).Set(b.Y)
+		k.Sub(k, a.Y)
 
+		div := big.NewInt(0).Set(b.X)
+		div.Sub(div, a.X)
+
+		k.Mul(k, modular.ModInverse(div, c.M)).Mod(k, c.M)
+
+		x3 := big.NewInt(0)
+		x3.Exp(k, big.NewInt(2), c.M)
+		x3.Sub(x3, a.X).Sub(x3, b.X).Mod(x3, c.M)
+
+		result.X.Set(x3)
+
+		y2 := big.NewInt(0).Set(a.X)
+		y2.Sub(y2, x3).Mod(y2, c.M)
+		y2.Mul(y2, k)
+		y2.Sub(y2, a.Y).Mod(y2, c.M)
+
+		result.Y.Set(y2)
 	}
 
 	return result
