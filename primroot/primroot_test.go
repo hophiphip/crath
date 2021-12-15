@@ -126,7 +126,7 @@ func TestPrimrootpn(t *testing.T) {
 			t.Error(
 				"For", test.p,
 				"and", test.n,
-				"primtoot", res[0],
+				"prim root", res[0],
 				"is not found in:", test.results,
 			)
 		}

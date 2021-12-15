@@ -9,8 +9,8 @@ import (
 	"math.io/crath/mulfunc"
 )
 
-// BinaryExponention is used to quickly calculate power of a number
-func BinaryExponention(value, power *big.Int) *big.Int {
+// BinaryExponentiation is used to quickly calculate power of a number
+func BinaryExponentiation(value, power *big.Int) *big.Int {
 	var (
 		result = big.NewInt(1)
 		zero   = big.NewInt(0)
@@ -97,34 +97,41 @@ func Modularfract(a, b, m *big.Int) *big.Int {
 }
 
 // GetSolution - returns solution for linear congruence equation
-// @modfunc - ModularFucntion which you want to use to calculate the result
+// @modfunc - ModularFunction which you want to use to calculate the result
 func GetSolution(modfunc modularFunction, a, b, m *big.Int) []*big.Int {
 	var (
-		abuf     = big.NewInt(0).Set(a)
-		bbuf     = big.NewInt(0).Set(b)
-		mbuf     = big.NewInt(0).Set(m)
+		aBuf     = big.NewInt(0).Set(a)
+		bBuf     = big.NewInt(0).Set(b)
+		mBuf     = big.NewInt(0).Set(m)
 		x        = big.NewInt(0)
 		zero     = big.NewInt(0)
 		one      = big.NewInt(1)
-		gcd      = gcd.Gcd(a, m)
+		gcdVal   = gcd.Gcd(a, m)
 		buf      = big.NewInt(0)
 		solution []*big.Int
 	)
 
-	if buf.Mod(b, gcd).Cmp(zero) != 0 || m.Cmp(one) < 0 {
+	if buf.Mod(b, gcdVal).Cmp(zero) != 0 || m.Cmp(one) < 0 {
 		return solution
 	}
 
-	abuf.Div(abuf, gcd)
-	bbuf.Div(bbuf, gcd)
-	mbuf.Div(mbuf, gcd)
-	x.Mod(BinaryModulo(modfunc(abuf, bbuf, mbuf), one, mbuf), mbuf)
+	aBuf.Div(aBuf, gcdVal)
+	bBuf.Div(bBuf, gcdVal)
+	mBuf.Div(mBuf, gcdVal)
+	x.Mod(BinaryModulo(modfunc(aBuf, bBuf, mBuf), one, mBuf), mBuf)
 
-	for gcd.Cmp(zero) > 0 {
+	for gcdVal.Cmp(zero) > 0 {
 		solution = append(solution, x)
-		x.Add(x, mbuf)
-		gcd.Sub(gcd, one)
+		x.Add(x, mBuf)
+		gcdVal.Sub(gcdVal, one)
 	}
 
 	return solution
+}
+
+// ModularInverse - inverse element a, where element * x = 1 (mode module)
+func ModularInverse(element, module *big.Int) *big.Int {
+	e := mulfunc.Euler(module)
+	e.Sub(e, big.NewInt(1))
+	return big.NewInt(0).Exp(element, e, module)
 }

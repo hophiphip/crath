@@ -6,8 +6,6 @@ import (
 	"math/big"
 )
 
-// TODO: Give functions their proper names
-
 // CountFractions count amount of fractions of a specific number
 func CountFractions(input *big.Int) (count *big.Int) {
 	num, pow, count, zero, buf, one := big.NewInt(0).Set(input), big.NewInt(0), big.NewInt(1), big.NewInt(0), big.NewInt(0), big.NewInt(1)
@@ -130,7 +128,7 @@ func Factorization(input *big.Int) []*big.Int {
 		zero = big.NewInt(0)
 		buf  = big.NewInt(0)
 		one  = big.NewInt(1)
-		res  = []*big.Int{}
+		res  []*big.Int
 	)
 
 	if num.Cmp(zero) == 0 {
@@ -167,14 +165,14 @@ func Factorization(input *big.Int) []*big.Int {
 	return res
 }
 
-// Uniquefactor - factorizes integers, but only unique integers
-func Uniquefactor(input *big.Int) []*big.Int {
+// UniqueFactor - factorizes integers, but only unique integers
+func UniqueFactor(input *big.Int) []*big.Int {
 	var (
 		num  = big.NewInt(0).Set(input)
 		zero = big.NewInt(0)
 		buf  = big.NewInt(0)
 		one  = big.NewInt(1)
-		res  = []*big.Int{}
+		res  []*big.Int
 	)
 
 	if num.Cmp(zero) == 0 {

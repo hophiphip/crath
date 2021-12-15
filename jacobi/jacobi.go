@@ -51,5 +51,5 @@ func Jacobi(a, m *big.Int) (int64, error) {
 		return result, nil
 	}
 
-	return 0, errors.New("Denominator does not equal to one")
+	return 0, errors.New("denominator does not equal to one")
 }

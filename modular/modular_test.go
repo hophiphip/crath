@@ -28,11 +28,27 @@ var testsBinaryModulo = []testBinaryModulo{
 	{big.NewInt(14), big.NewInt(4298), big.NewInt(33), big.NewInt(17)},
 }
 
-// TestGetSolution - tests all approaches to calculate modulo component
-//func TestGetSolution(t *testing.T) {
-//	fmt.Println("GetSolution test")
-//
-//}
+type ModularInverseCase struct {
+	element, module, result *big.Int
+}
+
+var testsModularInverse = []ModularInverseCase{
+	{
+		element: big.NewInt(2),
+		module:  big.NewInt(7),
+		result:  big.NewInt(4),
+	},
+	{
+		element: big.NewInt(123),
+		module:  big.NewInt(4567),
+		result:  big.NewInt(854),
+	},
+	{
+		element: big.NewInt(12),
+		module:  big.NewInt(119),
+		result:  big.NewInt(10),
+	},
+}
 
 func TestBinaryModulo(t *testing.T) {
 	fmt.Println("BinaryModulo test")
@@ -44,6 +60,19 @@ func TestBinaryModulo(t *testing.T) {
 				"For", test.val, test.pow, test.mod,
 				"Expected", test.result,
 				"Got", res,
+			)
+		}
+	}
+}
+
+func TestModularInverse(t *testing.T) {
+	buf := big.NewInt(0)
+	for _, testCase := range testsModularInverse {
+		buf.Set(ModularInverse(testCase.element, testCase.module))
+		if testCase.result.Cmp(buf) != 0 {
+			t.Error(
+				"For element: ", testCase.element, " and module: ", testCase.module,
+				"expected: ", testCase.result, " ,but got: ", buf,
 			)
 		}
 	}

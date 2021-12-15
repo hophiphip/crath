@@ -21,7 +21,7 @@ func Primrootp(p *big.Int) []*big.Int {
 		buf     = big.NewInt(0)
 		one     = big.NewInt(1)
 		euler   = mulfunc.Euler(input) //  == input - 1
-		factors = mulfunc.Uniquefactor(euler)
+		factors = mulfunc.UniqueFactor(euler)
 		size    = big.NewInt(int64(len(factors)))
 
 		// the only int64 here
@@ -78,7 +78,7 @@ func Primrootpn(p, n *big.Int) []*big.Int {
 	var (
 		primrootsp = Primrootp(p)
 		result     = []*big.Int{}
-		//mod        = modular.BinaryExponention(p, n)
+		//mod        = modular.BinaryExponentiation(p, n)
 		one = big.NewInt(1)
 	)
 
@@ -111,7 +111,7 @@ func Primroot2pn(p, n *big.Int) []*big.Int {
 	if buf.And(primrootpn[0], big.NewInt(1)).Cmp(big.NewInt(0)) != 0 {
 		result = append(result, big.NewInt(0).Set(primrootpn[0]))
 	} else {
-		result = append(result, big.NewInt(0).Add(primrootpn[0], modular.BinaryExponention(p, n)))
+		result = append(result, big.NewInt(0).Add(primrootpn[0], modular.BinaryExponentiation(p, n)))
 	}
 
 	return result

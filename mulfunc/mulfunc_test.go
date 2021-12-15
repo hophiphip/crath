@@ -88,7 +88,7 @@ func TestEuler(t *testing.T) {
 	fmt.Println("TestEuler:")
 
 	for _, pair := range tests {
-		fmt.Println("	Testing input:", pair.input)
+		fmt.Print("	Testing input:", pair.input)
 
 		ret := Euler(pair.input)
 		if ret.Cmp(pair.resultEuler) != 0 {
@@ -98,6 +98,8 @@ func TestEuler(t *testing.T) {
 				"got", ret,
 			)
 		}
+
+		fmt.Println(" Testing result:", pair.resultEuler)
 	}
 
 }
@@ -136,7 +138,7 @@ func TestUniquefactor(t *testing.T) {
 	for _, test := range testsUniquefact {
 		fmt.Println("	Testing input:", test.value)
 
-		result := Uniquefactor(test.value)
+		result := UniqueFactor(test.value)
 
 		if len(result) != len(test.result) {
 			t.Error(

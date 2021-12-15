@@ -6,6 +6,7 @@ import "math/big"
 // 		Em (A, B) == y^2 = x^3 + Ax + B (mod M)
 type SimpleCurve struct {
 	A, B, M *big.Int
+	points  []Point
 }
 
 type Point struct {
@@ -22,7 +23,7 @@ func (c *SimpleCurve) calculateVal(x *big.Int) *big.Int {
 		Mod(result, c.M)
 }
 
-func (c *SimpleCurve) getPoints() []Point {
+func (c *SimpleCurve) calculatePoints() []Point {
 	var points []Point
 	zero := big.NewInt(0)
 	one := big.NewInt(1)
@@ -52,10 +53,24 @@ func (c *SimpleCurve) getPoints() []Point {
 	return points
 }
 
+func (c *SimpleCurve) setPoints() {
+	c.points = c.calculatePoints()
+}
+
 func (c *SimpleCurve) addPoints(a, b Point) (Point, error) {
+	if len(c.points) < 1 {
+		c.points = c.calculatePoints()
+	}
+
 	result := Point{
 		X: big.NewInt(0),
 		Y: big.NewInt(0),
+	}
+
+	if a.X.Cmp(b.X) == 0 && a.Y.Cmp(b.Y) == 0 {
+
+	} else {
+
 	}
 
 	return result, nil

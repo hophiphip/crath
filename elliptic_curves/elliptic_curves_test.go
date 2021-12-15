@@ -128,9 +128,9 @@ func TestCalculateVal(t *testing.T) {
 	}
 }
 
-func TestGetPoints(t *testing.T) {
+func TestCalculatePoints(t *testing.T) {
 	for _, testSample := range pointsTestSamples {
-		points := testSample.curve.getPoints()
+		points := testSample.curve.calculatePoints()
 
 		if len(points) != len(testSample.points) {
 			t.Errorf("For the curve: E(%5.5s, %5.5s) expected amount of points: %d, but got: %d\n",
