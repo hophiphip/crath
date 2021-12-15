@@ -9,6 +9,10 @@ type InputOutput struct {
 	input, output *big.Int
 }
 
+type TwoInputOutput struct {
+	input1, input2, output Point
+}
+
 type CalculateTestCase struct {
 	curve  SimpleCurve
 	values []InputOutput
@@ -17,6 +21,11 @@ type CalculateTestCase struct {
 type GetPointsTestCase struct {
 	curve  SimpleCurve
 	points []Point
+}
+
+type AddPointsTestCase struct {
+	curve  SimpleCurve
+	values []TwoInputOutput
 }
 
 var curveTestSamples = []CalculateTestCase{
@@ -111,11 +120,132 @@ var pointsTestSamples = []GetPointsTestCase{
 	},
 }
 
+var addPointsTestSamples = []AddPointsTestCase{
+	{
+		curve: SimpleCurve{
+			A:      big.NewInt(3),
+			B:      big.NewInt(2),
+			M:      big.NewInt(5),
+			points: nil,
+		},
+		values: []TwoInputOutput{
+			{
+				input1: Point{
+					X: big.NewInt(1),
+					Y: big.NewInt(1),
+				},
+				input2: Point{
+					X: big.NewInt(1),
+					Y: big.NewInt(1),
+				},
+				output: Point{
+					X: big.NewInt(2),
+					Y: big.NewInt(1),
+				},
+			},
+			{
+				input1: Point{
+					X: big.NewInt(1),
+					Y: big.NewInt(4),
+				},
+				input2: Point{
+					X: big.NewInt(1),
+					Y: big.NewInt(4),
+				},
+				output: Point{
+					X: big.NewInt(2),
+					Y: big.NewInt(4),
+				},
+			},
+			{
+				input1: Point{
+					X: big.NewInt(2),
+					Y: big.NewInt(1),
+				},
+				input2: Point{
+					X: big.NewInt(2),
+					Y: big.NewInt(1),
+				},
+				output: Point{
+					X: big.NewInt(1),
+					Y: big.NewInt(4),
+				},
+			},
+			{
+				input1: Point{
+					X: big.NewInt(2),
+					Y: big.NewInt(4),
+				},
+				input2: Point{
+					X: big.NewInt(2),
+					Y: big.NewInt(4),
+				},
+				output: Point{
+					X: big.NewInt(1),
+					Y: big.NewInt(1),
+				},
+			},
+		},
+	},
+	{
+		curve: SimpleCurve{
+			A:      big.NewInt(2),
+			B:      big.NewInt(3),
+			M:      big.NewInt(7),
+			points: nil,
+		},
+		values: []TwoInputOutput{
+			{
+				input1: Point{
+					X: big.NewInt(2),
+					Y: big.NewInt(1),
+				},
+				input2: Point{
+					X: big.NewInt(2),
+					Y: big.NewInt(1),
+				},
+				output: Point{
+					X: big.NewInt(3),
+					Y: big.NewInt(6),
+				},
+			},
+			{
+				input1: Point{
+					X: big.NewInt(2),
+					Y: big.NewInt(6),
+				},
+				input2: Point{
+					X: big.NewInt(2),
+					Y: big.NewInt(6),
+				},
+				output: Point{
+					X: big.NewInt(3),
+					Y: big.NewInt(1),
+				},
+			},
+			{
+				input1: Point{
+					X: big.NewInt(3),
+					Y: big.NewInt(1),
+				},
+				input2: Point{
+					X: big.NewInt(3),
+					Y: big.NewInt(1),
+				},
+				output: Point{
+					X: big.NewInt(3),
+					Y: big.NewInt(6),
+				},
+			},
+		},
+	},
+}
+
 func TestCalculateVal(t *testing.T) {
 	buffer := big.NewInt(0)
 	for _, testSample := range curveTestSamples {
 		for _, testValue := range testSample.values {
-			buffer.Set(testSample.curve.calculateVal(testValue.input))
+			buffer.Set(testSample.curve.CalculateVal(testValue.input))
 			if buffer.Cmp(testValue.output) != 0 {
 				t.Errorf("For the curve: E(%5.5s, %5.5s) expected: %10.5s, but got: %10.5s\n",
 					testSample.curve.A.String(),
@@ -130,7 +260,7 @@ func TestCalculateVal(t *testing.T) {
 
 func TestCalculatePoints(t *testing.T) {
 	for _, testSample := range pointsTestSamples {
-		points := testSample.curve.calculatePoints()
+		points := testSample.curve.CalculatePoints()
 
 		if len(points) != len(testSample.points) {
 			t.Errorf("For the curve: E(%5.5s, %5.5s) expected amount of points: %d, but got: %d\n",
@@ -150,6 +280,28 @@ func TestCalculatePoints(t *testing.T) {
 					point.Y.String(),
 					points[i].X,
 					points[i].Y,
+				)
+			}
+		}
+	}
+}
+
+func TestAddPoints(t *testing.T) {
+	for _, testCase := range addPointsTestSamples {
+		for _, testValue := range testCase.values {
+			result := testCase.curve.AddPoints(testValue.input1, testValue.input2)
+			if result.X.Cmp(testValue.output.X) != 0 || result.Y.Cmp(testValue.output.Y) != 0 {
+				t.Errorf("For the curve: E(%5.5s, %5.5s) for points (%5.5s, %5.5s) and (%5.5s, %5.5s) addition result expected to be (%5.5s, %5.5s) but got (%5.5s, %5.5s)\n",
+					testCase.curve.A.String(),
+					testCase.curve.B.String(),
+					testValue.input1.X.String(),
+					testValue.input1.Y.String(),
+					testValue.input2.X.String(),
+					testValue.input2.Y.String(),
+					testValue.output.X.String(),
+					testValue.output.Y.String(),
+					result.X.String(),
+					result.Y.String(),
 				)
 			}
 		}

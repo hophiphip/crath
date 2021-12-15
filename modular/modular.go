@@ -129,8 +129,8 @@ func GetSolution(modfunc modularFunction, a, b, m *big.Int) []*big.Int {
 	return solution
 }
 
-// ModularInverse - inverse element a, where element * x = 1 (mode module)
-func ModularInverse(element, module *big.Int) *big.Int {
+// ModInverse - get inverse of an element, where element * x = 1 (mode module)
+func ModInverse(element, module *big.Int) *big.Int {
 	e := mulfunc.Euler(module)
 	e.Sub(e, big.NewInt(1))
 	return big.NewInt(0).Exp(element, e, module)

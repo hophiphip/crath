@@ -15,7 +15,7 @@ type testCase struct {
 	a, b, m *big.Int
 }
 
-var tests = []testCase{}
+var tests []testCase
 
 var testsBinaryModulo = []testBinaryModulo{
 	// result -- value -- power -- module
@@ -68,7 +68,7 @@ func TestBinaryModulo(t *testing.T) {
 func TestModularInverse(t *testing.T) {
 	buf := big.NewInt(0)
 	for _, testCase := range testsModularInverse {
-		buf.Set(ModularInverse(testCase.element, testCase.module))
+		buf.Set(ModInverse(testCase.element, testCase.module))
 		if testCase.result.Cmp(buf) != 0 {
 			t.Error(
 				"For element: ", testCase.element, " and module: ", testCase.module,
