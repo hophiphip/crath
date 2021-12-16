@@ -6,6 +6,8 @@ import (
 	"testing"
 )
 
+// TODO: Put tests into the separate file
+
 type InputOutput struct {
 	input, output *big.Int
 }
