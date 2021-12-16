@@ -695,6 +695,12 @@ func TestAdditionTable(t *testing.T) {
 			M:      big.NewInt(11),
 			points: nil,
 		},
+		{
+			A:      big.NewInt(3),
+			B:      big.NewInt(3),
+			M:      big.NewInt(11),
+			points: nil,
+		},
 	}
 
 	for _, c := range curves {

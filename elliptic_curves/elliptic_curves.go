@@ -124,6 +124,7 @@ func (c *SimpleCurve) AddPoints(a, b Point) (Point, error) {
 	return result, nil
 }
 
+// TODO: Incorrect order calculations - do some tests
 // PointOrd - point order == how many times point must be added to itself to get infinitely distant point
 func (c *SimpleCurve) PointOrd(p Point) *big.Int {
 	ord := big.NewInt(1)
