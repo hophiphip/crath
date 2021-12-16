@@ -1,6 +1,7 @@
 package ellipticcurves
 
 import (
+	"fmt"
 	"math.io/crath/modular"
 	"math/big"
 )
@@ -56,11 +57,11 @@ func (c *SimpleCurve) CalculatePoints() []Point {
 	return points
 }
 
-func (c *SimpleCurve) setPoints() {
+func (c *SimpleCurve) InitPoints() {
 	c.points = c.CalculatePoints()
 }
 
-func (c *SimpleCurve) AddPoints(a, b Point) Point {
+func (c *SimpleCurve) AddPoints(a, b Point) (Point, error) {
 	if len(c.points) < 1 {
 		c.points = c.CalculatePoints()
 	}
@@ -95,6 +96,8 @@ func (c *SimpleCurve) AddPoints(a, b Point) Point {
 		y2.Sub(y2, a.Y).Mod(y2, c.M)
 
 		result.Y.Set(y2)
+	} else if a.X.Cmp(b.X) == 0 { // x1 must not be equal to x2
+		return result, fmt.Errorf("infinitely distant point")
 	} else {
 		k := big.NewInt(0).Set(b.Y)
 		k.Sub(k, a.Y)
@@ -118,5 +121,30 @@ func (c *SimpleCurve) AddPoints(a, b Point) Point {
 		result.Y.Set(y2)
 	}
 
-	return result
+	return result, nil
+}
+
+// PointOrd - point order == how many times point must be added to itself to get infinitely distant point
+func (c *SimpleCurve) PointOrd(p Point) *big.Int {
+	ord := big.NewInt(1)
+	one := big.NewInt(1)
+	two := big.NewInt(2)
+	pt := Point{
+		X: p.X,
+		Y: p.Y,
+	}
+
+	y2 := big.NewInt(0)
+	var err error = nil
+	for y2.Set(pt.Y).Exp(y2, two, c.M); c.CalculateVal(pt.X).Cmp(y2) == 0; {
+		pt, err = c.AddPoints(pt, p)
+
+		ord.Add(ord, one)
+
+		if err != nil {
+			break
+		}
+	}
+
+	return ord
 }
