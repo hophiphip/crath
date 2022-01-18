@@ -3,10 +3,22 @@ package finitefield
 import (
 	"bufio"
 	"fmt"
+	"log"
+	ord2 "math.io/crath/ord"
 	"math/big"
 	"os"
+	"strings"
 	"testing"
 )
+
+// Constants for addition, multiplication, order tables
+
+// Field modulus
+const px = byte(0b0001_0111)
+const testAddFile = "test.add.txt"
+const testMulFile = "test.mul.txt"
+const testOrdFile = "test.ord.txt"
+const lineLen = 80
 
 type intToString struct {
 	input  int
@@ -136,12 +148,7 @@ func TestMulG_2_8(t *testing.T) {
 	}
 }
 
-func TestField(t *testing.T) {
-	testAddFile := "test.add.txt"
-	testMulFile := "test.mul.txt"
-
-	px := byte(0b0001_0111)
-
+func TestPrintAdditionTable(t *testing.T) {
 	fa, err := os.Create(testAddFile)
 	if err != nil {
 		t.Error(err)
@@ -152,21 +159,33 @@ func TestField(t *testing.T) {
 	for a := byte(0b0000_0000); ; a++ {
 
 		for b := byte(0b0000_0000); ; b++ {
-			wa.WriteString(fmt.Sprintf("%08b", AddG_2_8(a, b)))
-			wa.WriteString("\t")
+			result := AddG_2_8(a, b)
+
+			_, _ = wa.WriteString(fmt.Sprintf("%08b", result))
+			_, _ = wa.WriteString("\t")
 
 			if b == byte(0b1111_1111) {
-				wa.WriteString("\n")
+				_, _ = wa.WriteString("\n")
 				break
 			}
 		}
 
 		if a == byte(0b1111_1111) {
-			wa.WriteString("\n")
+			_, _ = wa.WriteString("\n")
 			break
 		}
 	}
 
+	// Cleanup
+	defer func() {
+		if err := fa.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+}
+
+func TestPrintMultiplicationTable(t *testing.T) {
+	// Multiplication table
 	fm, err := os.Create(testMulFile)
 	if err != nil {
 		t.Error(err)
@@ -177,30 +196,103 @@ func TestField(t *testing.T) {
 	for a := byte(0b0000_0000); ; a++ {
 
 		for b := byte(0b0000_0000); ; b++ {
-			wm.WriteString(fmt.Sprintf("%08b", MulG_2_8(a, b, px)))
-			wm.WriteString("\t")
+			_, _ = wm.WriteString(fmt.Sprintf("%08b", MulG_2_8(a, b, px)))
+			_, _ = wm.WriteString("\t")
 
 			if b == byte(0b1111_1111) {
-				wm.WriteString("\n")
+				_, _ = wm.WriteString("\n")
 				break
 			}
 		}
 
 		if a == byte(0b1111_1111) {
-			wm.WriteString("\n")
+			_, _ = wm.WriteString("\n")
 			break
 		}
 	}
 
+	// Cleanup
 	defer func() {
-		if err := fa.Close(); err != nil {
-			t.Error(err)
-		}
-
 		if err := fm.Close(); err != nil {
 			t.Error(err)
 		}
 	}()
+}
+
+func TestPrintElementOrderTable(t *testing.T) {
+	// Elements order table
+	fo, err := os.Create(testOrdFile)
+	if err != nil {
+		t.Error(err)
+	}
+
+	wo := bufio.NewWriter(fo)
+
+	pxStr, err := bigBitsToPolynomial(*big.NewInt(int64(px)))
+	if err != nil {
+		pxStr = ""
+	}
+
+	_, err = wo.WriteString(fmt.Sprintf("PX Modulo: %40.40s \n\n", pxStr))
+	if err != nil {
+		t.Error(err)
+	}
+
+	_, err = wo.WriteString(fmt.Sprintf("%7.7s | %40.40s | %8.8s | %5.5s\n", "Regular", "Polynomial", "Vector", "Order"))
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Line separator
+	_, err = wo.WriteString(fmt.Sprintf("%s\n", strings.Repeat("-", lineLen)))
+	if err != nil {
+		t.Error(err)
+	}
+
+	for a := byte(0b0000_0000); ; a++ {
+		ord, err := ord2.Ord(big.NewInt(int64(a)), big.NewInt(int64(px)))
+		ordStr := "0"
+
+		if err == nil {
+			ordStr = ord.String()
+		}
+
+		polynomial, err := bigBitsToPolynomial(*big.NewInt(int64(a)))
+		if err != nil {
+			polynomial = ""
+		}
+
+		_, err = wo.WriteString(fmt.Sprintf("%7.7d | %40.40s | %08b | %5.5s\n", int64(a), polynomial, a, ordStr))
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Line separator
+		_, err = wo.WriteString(fmt.Sprintf("%s\n", strings.Repeat("-", lineLen)))
+		if err != nil {
+			t.Error(err)
+		}
+
+		if a == byte(0b1111_1111) {
+			_, err = wo.WriteString("\n")
+			if err != nil {
+				t.Error(err)
+			}
+
+			break
+		}
+	}
+
+	// Cleanup
+	defer func() {
+		if err := fo.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+}
+
+func TestDumb(t *testing.T) {
+	log.Println(bigBitsToPolynomial(*big.NewInt(int64(byte(218)))))
 }
 
 func TestBitStringToByte(t *testing.T) {

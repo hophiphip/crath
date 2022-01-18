@@ -3,7 +3,6 @@ package finitefield
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"math/big"
 	"strconv"
 )
@@ -65,8 +64,6 @@ func byteToPolynomial(n byte) (string, error) {
 
 	for _, b := range fmt.Sprintf("%08b", n) {
 		if b == '1' {
-			log.Println(nBitCount)
-
 			if wasSthPrinted {
 				buffer.WriteString(" + ")
 			}
@@ -79,7 +76,6 @@ func byteToPolynomial(n byte) (string, error) {
 					if str, err := intToSuperscript(nBitCount); err != nil {
 						return "", err
 					} else {
-						log.Println(str)
 						buffer.WriteString(str)
 					}
 				}
@@ -132,7 +128,7 @@ func bigBitsToPolynomial(n big.Int) (string, error) {
 	return buffer.String(), nil
 }
 
-func fieldMul8Aplha(b *big.Int) (big.Int, error) {
+func fieldMul8Alpha(b *big.Int) (big.Int, error) {
 	ret := big.NewInt(0)
 
 	bBytes := b.Bytes()
@@ -184,7 +180,7 @@ func fieldMul8(a, b *big.Int) (big.Int, error) {
 	return *ret, nil
 }
 
-// Product if elementis in GF(2^8) with p(x)
+// Product if element is in GF(2^8) with p(x)
 // Example p(x) = x^8 + x^4 + x^3 + x^2 + 1
 // 				--> px = 0001_1101 --> 0b00011101
 // MulG_2_8 - multiplication of elements in field GF(2^8)
