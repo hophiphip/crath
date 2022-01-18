@@ -3,7 +3,6 @@ package finitefield
 import (
 	"bufio"
 	"fmt"
-	"log"
 	ord2 "math.io/crath/ord"
 	"math/big"
 	"os"
@@ -178,6 +177,10 @@ func TestPrintAdditionTable(t *testing.T) {
 
 	// Cleanup
 	defer func() {
+		if err := wa.Flush(); err != nil {
+			t.Error(err)
+		}
+
 		if err := fa.Close(); err != nil {
 			t.Error(err)
 		}
@@ -213,6 +216,10 @@ func TestPrintMultiplicationTable(t *testing.T) {
 
 	// Cleanup
 	defer func() {
+		if err := wm.Flush(); err != nil {
+			t.Error(err)
+		}
+
 		if err := fm.Close(); err != nil {
 			t.Error(err)
 		}
@@ -285,14 +292,15 @@ func TestPrintElementOrderTable(t *testing.T) {
 
 	// Cleanup
 	defer func() {
+		// Don't forget to flush C:
+		if err := wo.Flush(); err != nil {
+			t.Error(err)
+		}
+
 		if err := fo.Close(); err != nil {
 			t.Error(err)
 		}
 	}()
-}
-
-func TestDumb(t *testing.T) {
-	log.Println(bigBitsToPolynomial(*big.NewInt(int64(byte(218)))))
 }
 
 func TestBitStringToByte(t *testing.T) {
