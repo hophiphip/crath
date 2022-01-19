@@ -3,6 +3,8 @@ package finitefield
 import (
 	"bufio"
 	"fmt"
+	"math"
+	"math.io/crath/mulfunc"
 	ord2 "math.io/crath/ord"
 	"math/big"
 	"os"
@@ -227,6 +229,12 @@ func TestPrintMultiplicationTable(t *testing.T) {
 }
 
 func TestPrintElementOrderTable(t *testing.T) {
+	// Primitive element order
+	primitiveOrder := big.NewInt(int64(px - 1))
+	var primitiveElements []byte
+
+	amountOfPrimitiveElements := mulfunc.Euler(big.NewInt(int64(math.Pow(2, 8)) - 1))
+
 	// Elements order table
 	fo, err := os.Create(testOrdFile)
 	if err != nil {
@@ -240,7 +248,12 @@ func TestPrintElementOrderTable(t *testing.T) {
 		pxStr = ""
 	}
 
-	_, err = wo.WriteString(fmt.Sprintf("PX Modulo: %40.40s \n\n", pxStr))
+	_, err = wo.WriteString(fmt.Sprintf("PX Modulo: %40.40s \n", pxStr))
+	if err != nil {
+		t.Error(err)
+	}
+
+	_, err = wo.WriteString(fmt.Sprintf("Amount of primitive elements: %9.9s \n\n", amountOfPrimitiveElements.String()))
 	if err != nil {
 		t.Error(err)
 	}
@@ -257,11 +270,16 @@ func TestPrintElementOrderTable(t *testing.T) {
 	}
 
 	for a := byte(0b0000_0000); ; a++ {
-		ord, err := ord2.Ord(big.NewInt(int64(a)), big.NewInt(int64(px)))
+		order, err := ord2.Ord(big.NewInt(int64(a)), big.NewInt(int64(px)))
 		ordStr := "0"
 
 		if err == nil {
-			ordStr = ord.String()
+			ordStr = order.String()
+
+			// Find all primitive elements
+			if order.Cmp(primitiveOrder) == 0 {
+				primitiveElements = append(primitiveElements, a)
+			}
 		}
 
 		polynomial, err := bigBitsToPolynomial(*big.NewInt(int64(a)))
@@ -287,6 +305,17 @@ func TestPrintElementOrderTable(t *testing.T) {
 			}
 
 			break
+		}
+	}
+
+	// Print primitive elements
+	if _, err := wo.WriteString(fmt.Sprintf("(%d) Primitive elements: \n", len(primitiveElements))); err != nil {
+		t.Error(err)
+	}
+
+	for index, primitive := range primitiveElements {
+		if _, err := wo.WriteString(fmt.Sprintf("%3.3d: %d\n", index, primitive)); err != nil {
+			t.Error(err)
 		}
 	}
 
